@@ -212,9 +212,9 @@ def pathify_collections(filter, source)
     pathified_filter.each do |filter_path|
       if filter_path.include?(Enumerable)
         expanded_paths = pathified_source.select { |source_path|
-          source_path.each_with_index.inject(true) { |memo, (element, index)| 
-            memo = false unless ((filter_path[index] == element) || (filter_path[index] == Enumerable))
-            print "#{element} #{filter_path[index]} #{memo} |\n"
+          p source_path.each_with_index.inject(true) { |memo, (element, index)| 
+            memo = false unless filter_path[index] == element || filter_path[index] == Enumerable
+            memo
           }
         }
         pathified_filter.delete(filter_path)
