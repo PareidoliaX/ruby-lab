@@ -172,6 +172,122 @@ class TestParameters < Minitest::Test
                               [:region_roles, 'global', :empty_to_nil], 
                               [:region_roles, "5ac29fc2b0c2a8c381c380c2a6003908", :empty_to_nil], 
                               [:region_roles, "5ac29fc2b0c2a8c381c380c2a600447a", :empty_to_nil]]
+
+    @contact_unclean2 =  {"_searched_for_duplicates"=>"1",
+                         "first_name"=>"Cinnamon",
+                         "middle_name"=>"Dawn",
+                         "last_name"=>"Lennox",
+                         "language_pref"=>"en",
+                         "do_not_email"=>"0",
+                         "do_not_phone"=>"0",
+                         "do_not_mail"=>"0",
+                         "phones_attributes"=>{"0"=>{"number"=>"5555555555", "textable"=>"0", "_primary"=>"1", "_destroy"=>""}},
+                         "addresses_attributes"=>
+                          {"0"=>
+                            {"unit_num"=>"",
+                             "bldg_num"=>"525",
+                             "street_name"=>"Bowlsby",
+                             "street_type"=>"Pl",
+                             "street_dir"=>"",
+                             "town"=>"Victoria",
+                             "mail_prov"=>"BC",
+                             "postal_code"=>"V9A 4C6",
+                             "bldg_num_sfx"=>"",
+                             "rural_addr_type"=>"",
+                             "rural_section"=>"",
+                             "rural_township"=>"",
+                             "rural_range"=>"",
+                             "rural_meridian"=>"",
+                             "rural_lot"=>"",
+                             "rural_concession"=>"",
+                             "rural_physical_addr"=>"",
+                             "mail_flag"=>"",
+                             "mail_addr1"=>"525 Bowlsby Pl",
+                             "mail_addr2"=>"",
+                             "mail_place"=>"Victoria",
+                             "mail_postal_code"=>"V9A 4C6",
+                             "_primary"=>"1",
+                             "_destroy"=>""}},
+                         "district_id"=>"642"}
+
+    @contact_filter2 = {
+                        first_name: :empty_to_nil, 
+                        middle_name: :empty_to_nil, 
+                        last_name: :empty_to_nil, 
+                        district_id: :to_i_or_nil,
+                        language_pref: :to_sym,
+                        do_not_email: :to_bool,
+                        do_not_phone: :to_bool,
+                        do_not_mail: :to_bool, 
+                        phones_attributes: {Enumerable => {
+                          number: :only_digits
+                          }},
+                        emails_attributes: {Enumerable => {
+                          }},
+                        addresses_attributes: {Enumerable => {
+                          unit_num: :empty_to_nil,
+                          bldg_num: :empty_to_nil,
+                          street_name: :empty_to_nil,
+                          street_type: :empty_to_nil,
+                          street_dir: :empty_to_nil,
+                          town: :empty_to_nil,
+                          mail_prov: :empty_to_nil,
+                          postal_code: :empty_to_nil,
+                          bldg_num_sfx: :empty_to_nil,
+                          rural_addr_type: :empty_to_nil,
+                          rural_section: :empty_to_nil,
+                          rural_township: :empty_to_nil,
+                          rural_range: :empty_to_nil,
+                          rural_meridian: :empty_to_nil,
+                          rural_lot: :empty_to_nil,
+                          rural_concession: :empty_to_nil,
+                          rural_physical_addr: :empty_to_nil,
+                          mail_flag: :empty_to_nil,
+                          mail_addr1: :empty_to_nil,
+                          mail_addr2: :empty_to_nil,
+                          mail_place: :empty_to_nil,
+                          mail_place_code: :empty_to_nil,
+                          }},
+                        }
+
+      @contact_result2 = {
+                           "_searched_for_duplicates"=>"1",
+                           "first_name"=>"Cinnamon",
+                           "middle_name"=>"Dawn",
+                           "last_name"=>"Lennox",
+                           "language_pref"=>"en",
+                           "do_not_email"=> false,
+                           "do_not_phone"=> false,
+                           "do_not_mail"=> false,
+                           "phones_attributes"=>{"0"=>{"number"=>"5555555555", "textable"=>"0", "_primary"=>"1", "_destroy"=>""}},
+                           "addresses_attributes"=>
+                            {"0"=>
+                              {"unit_num"=>nil,
+                               "bldg_num"=>"525",
+                               "street_name"=>"Bowlsby",
+                               "street_type"=>"Pl",
+                               "street_dir"=>nil,
+                               "town"=>"Victoria",
+                               "mail_prov"=>"BC",
+                               "postal_code"=>"V9A 4C6",
+                               "bldg_num_sfx"=>nil,
+                               "rural_addr_type"=>nil,
+                               "rural_section"=>nil,
+                               "rural_township"=>nil,
+                               "rural_range"=>nil,
+                               "rural_meridian"=>nil,
+                               "rural_lot"=>nil,
+                               "rural_concession"=>nil,
+                               "rural_physical_addr"=>nil,
+                               "mail_flag"=>nil,
+                               "mail_addr1"=>"525 Bowlsby Pl",
+                               "mail_addr2"=>nil,
+                               "mail_place"=>"Victoria",
+                               "mail_postal_code"=>"V9A 4C6",
+                               "_primary"=>"1",
+                               "_destroy"=>""}},
+                           "district_id"=>"642"
+      }
   end
 
   def test_user_pathified
@@ -189,5 +305,8 @@ class TestParameters < Minitest::Test
   def test_user_scrub
     assert_equal(@user_result, @user_unclean.scrub(@user_filter))
   end
- 
+
+  def test_contact2_scrub
+    assert_equal(@contact_result2, @contact_unclean2.scrub(@contact_filter2))
+  end
 end

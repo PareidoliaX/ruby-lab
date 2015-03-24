@@ -3,6 +3,9 @@ class Hash
   def scrub(filter)
     params = self.class.new
     params.merge!(self)
+    filter = filter.map {|p| p.map {|e| e.is_a?(Symbol) ? e.to_s : e }}
+    params = params.map {|p| p.map {|e| e.is_a?(Symbol) ? e.to_s : e }}
+    binding.pry
     pathify_collections(filter, params).each do |path|
       action = path.pop
       value = get_by_keys(params, path)
@@ -40,6 +43,7 @@ class Hash
     pathified_source = pathify_keys(source)
 
     pathified_filter = pathified_filter.each {|p| p << get_by_keys(filter, p)}
+    #pathified_filter = pathified_filter.map {|p| p.map {|e| e.is_a?(Symbol) ? e.to_s : e }}
     includes_enum = ->(i){ i.include?(Enumerable)}
       pathified_filter.each do |filter_path|
         if filter_path.include?(Enumerable)
@@ -61,6 +65,11 @@ class Hash
 end
 
 class String
+  def blank?
+    self.length == 0
+  end
+
+
   def empty_to_nil
     self.empty? ? nil : self
   end
