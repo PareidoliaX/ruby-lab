@@ -1,13 +1,21 @@
-# File:  tc_simple_number.rb
- 
+
+
+require 'active_support'
+require 'active_support/hash_with_indifferent_access'
 require './scrub_params'
 require 'minitest/autorun'
+
 
  
 class TestParameters < Minitest::Test
 
+  def sh hash
+    res = ActiveSupport::HashWithIndifferentAccess.new(hash)
+    res
+  end
+
  def setup
-    @contact_unclean = {:voter_id=>"",
+    @contact_unclean = sh({:voter_id=>"",
      :civi_id=>"",
      :district_id=>1,
      :poll_id=>"",
@@ -17,13 +25,13 @@ class TestParameters < Minitest::Test
      :first_name=>"Sterling",
      :middle_name=>nil,
      :last_name=>"Archer",
-     :notes=>{'1' => {commenters: {'bob' => "Bud", 'dick' => "wei", 'harry' => "ser"}, body: "Text"}, '2' => {commenters: {'bob' => "Bud", 'dick' => "wei", 'harry' => "ser"}, body: "Text"}, '3' => {}, '4' => {}},
-     :primary_email=>{"label"=>nil, "address"=>"sterling@isis.org"},
+     :notes=>sh({'1' => sh({commenters: sh({'bob' => "Bud", 'dick' => "wei", 'harry' => "ser"}), body: "Text"}), '2' => sh({commenters: sh({'bob' => "Bud", 'dick' => "wei", 'harry' => "ser"}), body: "Text"}), '3' => sh({}), '4' => sh({})}),
+     :primary_email=>sh({"label"=>nil, "address"=>"sterling@isis.org"}),
      :other_emails=>[],
-     :primary_phone=>{"number"=>"4444444444", "label"=>nil, "textable"=>"0"},
-     :other_phones=>[{"number"=>"3333333333", "label"=>nil, "textable"=>"0"}],
+     :primary_phone=>sh({"number"=>"4444444444", "label"=>nil, "textable"=>"0"}),
+     :other_phones=>[sh({"number"=>"3333333333", "label"=>nil, "textable"=>"0"})],
      :primary_address=>
-      {"unit_num"=>nil,
+      sh({"unit_num"=>nil,
        "bldg_num"=>"5",
        "street_name"=>"Albert",
        "street_type"=>"St",
@@ -44,17 +52,17 @@ class TestParameters < Minitest::Test
        "mail_addr1"=>nil,
        "mail_addr2"=>nil,
        "mail_place"=>nil,
-       "mail_postal_code"=>nil},
+       "mail_postal_code"=>nil}),
      :other_addresses=>[],
      :do_not_email=>false,
      :do_not_phone=>false,
      :do_not_mail=>false,
      :tag_ids=>["c3a5c2b343c2b5c2a3c2a9c399000f82", "6f30c3a764c2a64c69c3962236001038", "4ec39fc28fc2b914c3b34fc3a400162d"],
      :created_at=>1425322674,
-     :updated_at=>1426269496}
+     :updated_at=>1426269496})
 
 
-    @contact_result = {:voter_id=>"",
+    @contact_result = sh({:voter_id=>"",
      :civi_id=>nil,
      :district_id=>1,
      :poll_id=>nil,
@@ -64,13 +72,13 @@ class TestParameters < Minitest::Test
      :first_name=>"Sterling",
      :middle_name=>nil,
      :last_name=>"Archer",
-     :notes=>{'1' => {commenters: {'bob' => "Bud", 'dick' => "wei", 'harry' => "ser"}, body: "Text"}, '2' => {commenters: {'bob' => "Bud", 'dick' => "wei", 'harry' => "ser"}, body: "Text"}, '3' => {}, '4' => {}},
+     :notes=>sh({'1' => sh({commenters: sh({'bob' => "Bud", 'dick' => "wei", 'harry' => "ser"}), body: "Text"}), '2' => sh({commenters: sh({'bob' => "Bud", 'dick' => "wei", 'harry' => "ser"}), body: "Text"}), '3' => sh({}), '4' => sh({})}),
      :primary_email=>{"label"=>nil, "address"=>"sterling@isis.org"},
      :other_emails=>[],
-     :primary_phone=>{"number"=>"4444444444", "label"=>nil, "textable"=>"0"},
-     :other_phones=>[{"number"=>"3333333333", "label"=>nil, "textable"=>"0"}],
+     :primary_phone=>sh({"number"=>"4444444444", "label"=>nil, "textable"=>"0"}),
+     :other_phones=>[sh({"number"=>"3333333333", "label"=>nil, "textable"=>"0"})],
      :primary_address=>
-      {"unit_num"=>nil,
+      sh({"unit_num"=>nil,
        "bldg_num"=>"5",
        "street_name"=>"Albert",
        "street_type"=>"St",
@@ -91,23 +99,23 @@ class TestParameters < Minitest::Test
        "mail_addr1"=>nil,
        "mail_addr2"=>nil,
        "mail_place"=>nil,
-       "mail_postal_code"=>nil},
+       "mail_postal_code"=>nil}),
      :other_addresses=>[],
      :do_not_email=>false,
      :do_not_phone=>false,
      :do_not_mail=>false,
      :tag_ids=>["c3a5c2b343c2b5c2a3c2a9c399000f82", "6f30c3a764c2a64c69c3962236001038", "4ec39fc28fc2b914c3b34fc3a400162d"],
      :created_at=>1425322674,
-     :updated_at=>1426269496}
+     :updated_at=>1426269496})
 
-    @contact_filter = { notes: {Enumerable => {commenters: {Enumerable => :empty_to_nil}}}, poll_id: :empty_to_nil, civi_id: :empty_to_nil }
+    @contact_filter = sh({ notes: sh({Enumerable => sh({commenters: sh({Enumerable => :empty_to_nil})})}), poll_id: :empty_to_nil, civi_id: :empty_to_nil })
 
-    @user_unclean = {:email=>"admin@example.com",
+    @user_unclean = sh({:email=>"admin@example.com",
                      :phone=>nil,
                      :first_name=>"Elizabeth",
                      :last_name=>"",
                      :phone_number=>"",
-                     :region_roles=>{"global"=>"admin", "5ac29fc2b0c2a8c381c380c2a6003908"=>nil, "5ac29fc2b0c2a8c381c380c2a600447a"=>nil},
+                     :region_roles=>sh({"global"=>"admin", "5ac29fc2b0c2a8c381c380c2a6003908"=>nil, "5ac29fc2b0c2a8c381c380c2a600447a"=>nil}),
                      :current_region_id=>"5ac29fc2b0c2a8c381c380c2a6003908",
                      :recent_contact_ids=>["58c39878c284c2bcc2b5384422001793", "0920c287c28330320475c3aac20001b4"],
                      :password_digest=>"$2a$10$hvYPFmgGwrYolMmj1OayX.cJpekKH2qfh9iT94hXlGjRIGnGdxJ.u",
@@ -125,26 +133,26 @@ class TestParameters < Minitest::Test
                      :last_sign_in_ip=>"::1",
                      :accepted_terms_of_service=>true,
                      :created_at=>1424893254,
-                     :updated_at=>1425323810}
+                     :updated_at=>1425323810})
 
-    @user_filter = {
+    @user_filter = sh({
                       first_name: :empty_to_nil,
                       last_name: :empty_to_nil,
                       email: :empty_to_nil,
                       phone_number: :empty_to_nil,
                       current_region_id: :empty_to_nil,
-                      region_roles: { Enumerable => :empty_to_nil },
-                      phones_attributes: { Enumerable => {
+                      region_roles: sh({ Enumerable => :empty_to_nil }),
+                      phones_attributes: sh({ Enumerable => sh({
                         label: :empty_to_nil
-                      }}
-                    }
+                      })})
+                    })
 
-    @user_result = {:email=>"admin@example.com",
+    @user_result = sh({:email=>"admin@example.com",
                      :phone=>nil,
                      :first_name=>"Elizabeth",
                      :last_name=>nil,
                      :phone_number=>nil,
-                     :region_roles=>{"global"=>"admin", "5ac29fc2b0c2a8c381c380c2a6003908"=>nil, "5ac29fc2b0c2a8c381c380c2a600447a"=>nil},
+                     :region_roles=>sh({"global"=>"admin", "5ac29fc2b0c2a8c381c380c2a6003908"=>nil, "5ac29fc2b0c2a8c381c380c2a600447a"=>nil}),
                      :current_region_id=>"5ac29fc2b0c2a8c381c380c2a6003908",
                      :recent_contact_ids=>["58c39878c284c2bcc2b5384422001793", "0920c287c28330320475c3aac20001b4"],
                      :password_digest=>"$2a$10$hvYPFmgGwrYolMmj1OayX.cJpekKH2qfh9iT94hXlGjRIGnGdxJ.u",
@@ -162,7 +170,7 @@ class TestParameters < Minitest::Test
                      :last_sign_in_ip=>"::1",
                      :accepted_terms_of_service=>true,
                      :created_at=>1424893254,
-                     :updated_at=>1425323810}
+                     :updated_at=>1425323810})
 
     @user_filter_pathified = [[:first_name, :empty_to_nil], 
                               [:last_name, :empty_to_nil], 
@@ -173,7 +181,7 @@ class TestParameters < Minitest::Test
                               [:region_roles, "5ac29fc2b0c2a8c381c380c2a6003908", :empty_to_nil], 
                               [:region_roles, "5ac29fc2b0c2a8c381c380c2a600447a", :empty_to_nil]]
 
-    @contact_unclean2 =  {"_searched_for_duplicates"=>"1",
+    @contact_unclean2 =  sh({"_searched_for_duplicates"=>"1",
                          "first_name"=>"Cinnamon",
                          "middle_name"=>"Dawn",
                          "last_name"=>"Lennox",
@@ -181,10 +189,10 @@ class TestParameters < Minitest::Test
                          "do_not_email"=>"0",
                          "do_not_phone"=>"0",
                          "do_not_mail"=>"0",
-                         "phones_attributes"=>{"0"=>{"number"=>"5555555555", "textable"=>"0", "_primary"=>"1", "_destroy"=>""}},
+                         "phones_attributes"=>sh({"0"=>sh({"number"=>"5555555555", "textable"=>"0", "_primary"=>"1", "_destroy"=>""})}),
                          "addresses_attributes"=>
-                          {"0"=>
-                            {"unit_num"=>"",
+                          sh({"0"=>
+                            sh({"unit_num"=>"",
                              "bldg_num"=>"525",
                              "street_name"=>"Bowlsby",
                              "street_type"=>"Pl",
@@ -207,10 +215,10 @@ class TestParameters < Minitest::Test
                              "mail_place"=>"Victoria",
                              "mail_postal_code"=>"V9A 4C6",
                              "_primary"=>"1",
-                             "_destroy"=>""}},
-                         "district_id"=>"642"}
+                             "_destroy"=>""})}),
+                         "district_id"=>"642"})
 
-    @contact_filter2 = {
+    @contact_filter2 = sh({
                         first_name: :empty_to_nil, 
                         middle_name: :empty_to_nil, 
                         last_name: :empty_to_nil, 
@@ -219,12 +227,12 @@ class TestParameters < Minitest::Test
                         do_not_email: :to_bool,
                         do_not_phone: :to_bool,
                         do_not_mail: :to_bool, 
-                        phones_attributes: {Enumerable => {
+                        phones_attributes: sh({Enumerable => sh({
                           number: :only_digits
-                          }},
-                        emails_attributes: {Enumerable => {
-                          }},
-                        addresses_attributes: {Enumerable => {
+                          })}),
+                        emails_attributes: sh({Enumerable => sh({
+                          })}),
+                        addresses_attributes: sh({Enumerable => sh({
                           unit_num: :empty_to_nil,
                           bldg_num: :empty_to_nil,
                           street_name: :empty_to_nil,
@@ -247,10 +255,10 @@ class TestParameters < Minitest::Test
                           mail_addr2: :empty_to_nil,
                           mail_place: :empty_to_nil,
                           mail_place_code: :empty_to_nil,
-                          }},
-                        }
+                          })}),
+                        })
 
-      @contact_result2 = {
+      @contact_result2 = sh({
                            "_searched_for_duplicates"=>"1",
                            "first_name"=>"Cinnamon",
                            "middle_name"=>"Dawn",
@@ -259,10 +267,10 @@ class TestParameters < Minitest::Test
                            "do_not_email"=> false,
                            "do_not_phone"=> false,
                            "do_not_mail"=> false,
-                           "phones_attributes"=>{"0"=>{"number"=>"5555555555", "textable"=>"0", "_primary"=>"1", "_destroy"=>""}},
+                           "phones_attributes"=>sh({"0"=>sh({"number"=>"5555555555", "textable"=>"0", "_primary"=>"1", "_destroy"=>""})}),
                            "addresses_attributes"=>
-                            {"0"=>
-                              {"unit_num"=>nil,
+                            sh({"0"=>
+                              sh({"unit_num"=>nil,
                                "bldg_num"=>"525",
                                "street_name"=>"Bowlsby",
                                "street_type"=>"Pl",
@@ -285,9 +293,9 @@ class TestParameters < Minitest::Test
                                "mail_place"=>"Victoria",
                                "mail_postal_code"=>"V9A 4C6",
                                "_primary"=>"1",
-                               "_destroy"=>""}},
+                               "_destroy"=>""})}),
                            "district_id"=>"642"
-      }
+      })
   end
 
   def test_user_pathified

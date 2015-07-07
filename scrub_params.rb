@@ -1,66 +1,69 @@
 
-class Hash
+require 'active_support'
+require 'active_support/hash_with_indifferent_access'
+
+class ActiveSupport::HashWithIndifferentAccess
   def scrub(filter)
-    params = self.class.new
-    params.merge!(self)
-    filter = filter.map {|p| p.map {|e| e.is_a?(Symbol) ? e.to_s : e }}
-    params = params.map {|p| p.map {|e| e.is_a?(Symbol) ? e.to_s : e }}
-    binding.pry
-    pathify_collections(filter, params).each do |path|
-      action = path.pop
-      value = get_by_keys(params, path)
-      if value
-        set_by_keys(params, path, value.send(action))
+        filter = filter.with_indifferent_access
+        params = self.class.new
+        params.merge!(self)
+        pathify_collections(filter, params).each do |path|
+          action = path.pop
+          value = get_by_keys(params, path)
+          if value
+            set_by_keys(params, path, value.send(action))
+          end
+        end
+        params
       end
-    end
 
-    params
-  end
+      private
 
-  def get_by_keys(hash, keys)
-    keys.inject(hash) { |h, k| h.public_send(:[], k) }
-  end
-
-  def set_by_keys(hash, keys, v)
-    last = keys[0..-2].inject(hash) { |h, k| h.public_send(:[], k) }
-    last.public_send(:[]=, keys[-1], v)
-    hash
-  end
-
-  def pathify_keys(hsh)
-    hsh.inject([]) do |mem,(key, value)|
-      if value.is_a?(Hash)
-        pathify_keys(value).each { |arr| mem << ([key] + arr) }
-      else
-        mem << [key]
+      def get_by_keys(hash, keys)
+        keys.inject(hash) { |h, k| h.public_send(:[], k) }
       end
-      mem
-    end
-  end
 
-  def pathify_collections(filter, source)
-    pathified_filter = pathify_keys(filter)
-    pathified_source = pathify_keys(source)
+      def set_by_keys(hash, keys, v)
+        last = keys[0..-2].inject(hash) { |h, k| h.public_send(:[], k) }
+        last.public_send(:[]=, keys[-1], v)
+        hash
+      end
 
-    pathified_filter = pathified_filter.each {|p| p << get_by_keys(filter, p)}
-    #pathified_filter = pathified_filter.map {|p| p.map {|e| e.is_a?(Symbol) ? e.to_s : e }}
-    includes_enum = ->(i){ i.include?(Enumerable)}
-      pathified_filter.each do |filter_path|
-        if filter_path.include?(Enumerable)
-          expanded_paths = pathified_source.select { |source_path|
-            source_path << filter_path.last
-            source_path.each_with_index.inject(true) { |memo, (element, index)| 
-              memo = false unless filter_path[index] == element || filter_path[index] == Enumerable
-              memo
-            }
-          }
-          pathified_filter.delete(filter_path)
-          pathified_filter += expanded_paths
+      def pathify_keys(hsh)
+        hsh.inject([]) do |mem,(key, value)|
+          if value.is_a?(Hash)
+            pathify_keys(value).each { |arr| mem << ([key] + arr) }
+          else
+            mem << [key]
+          end
+          mem
         end
       end
-    pathified_filter.delete_if { |p| p.include?(Enumerable) }
-    pathified_filter
-  end
+
+      def pathify_collections(filter, source)
+        pathified_filter = pathify_keys(filter)
+        pathified_source = pathify_keys(source)
+
+        pathified_filter = pathified_filter.each {|p| p << get_by_keys(filter, p)}
+        includes_enum = ->(i){ i.include?(Enumerable)}
+          pathified_filter.each do |filter_path|
+            if filter_path.include?(Enumerable)
+              expanded_paths = pathified_source.select { |source_path|
+                sp = source_path += [filter_path.last]
+                sp.each_with_index.inject(true) { |memo, (element, index)| 
+                  memo = false unless filter_path[index] == element || filter_path[index] == Enumerable
+                  memo
+                }
+              }
+              expanded_paths.each { |p| p << filter_path.last }
+              pathified_filter.delete(filter_path)
+              pathified_filter += expanded_paths
+            end
+          end
+        pathified_filter.delete_if { |p| p.include?(Enumerable) }
+        pathified_filter
+      end
+
 
 end
 
